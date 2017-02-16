@@ -1,8 +1,8 @@
------------------------------------------------------------------------------------------
---					-------------------------------------------------
+-------------------------------------------------------------------------------------
+--				                         	-------------------------------------------------
 -- Lone Wolf : backpack_normal.lua	-------------------------------------------------
---					-------------------------------------------------
------------------------------------------------------------------------------------------
+--				                          -------------------------------------------------
+-------------------------------------------------------------------------------------
 
 local composer = require( "composer" )
 
@@ -77,7 +77,7 @@ function scene:create( event )
     end
 
 	-- Parchment background
-    local parch_background = display.newImageRect( sceneGroup, "pic/parch_background_warrior.png", 300, 556 )      
+    local parch_background = display.newImageRect( sceneGroup, "pic/parch_background_warrior.png", 300, 556 )
     parch_background.x = display.contentCenterX
     parch_background.y = display.contentCenterY
 
@@ -145,7 +145,7 @@ function scene:create( event )
     addObject:setFillColor(0,0,0)
     addObject.anchorX = 0
     addObject:addEventListener("tap", addObjFunc)
-	
+
 	-- Text field -> add object spec
     addSpecObjField = native.newTextField( 130, 280, 180, 20 )
 	addSpecObjField:addEventListener( "userInput", textListener )
