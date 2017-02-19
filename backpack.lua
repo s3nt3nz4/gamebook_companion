@@ -1,8 +1,8 @@
------------------------------------------------------------------------------------------
---					-------------------------------------------------
--- Lone Wolf : backpack_normal.lua	-------------------------------------------------
---					-------------------------------------------------
------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+--				                         
+-- Lone Wolf : backpack_normal.lua	       
+--				                          
+-------------------------------------------------------------------------------------
 
 local composer = require( "composer" )
 
@@ -49,7 +49,6 @@ function scene:create( event )
     loadSheet()
 
     -- declare text field objects
-   -- local addObjField
     local typedObject
 
 	-- Fonction de stockage de la fiche de perso dans un fichier json
@@ -78,7 +77,7 @@ function scene:create( event )
     end
 
 	-- Parchment background
-    local parch_background = display.newImageRect( sceneGroup, "pic/parch_background_warrior.png", 300, 556 )      
+    local parch_background = display.newImageRect( sceneGroup, "pic/parch_background_warrior.png", 300, 556 )
     parch_background.x = display.contentCenterX
     parch_background.y = display.contentCenterY
 
@@ -101,8 +100,6 @@ function scene:create( event )
     -- Text field -> add object
     addObjField = native.newTextField( 130, 80, 180, 20 )
 	addObjField:addEventListener( "userInput", textListener )
-	print(addObjField[1])
-	print(#addObjField)
 
     -- Repas
     local backpackMeal = display.newText( sceneGroup, "Repas : " .. carac.meal .. "\n", 40, 100, 250, 0, native.systemFont, 16 )
@@ -110,8 +107,40 @@ function scene:create( event )
     backpackMeal.anchorX = 0
     backpackMeal.anchorY = 0
 
+    local function addMeal()
+        if carac.charge < 8 then
+            carac.meal = carac.meal + 1
+            carac.charge = carac.charge + 1
+        else
+            carac.charge = 8
+        end
+        jsonSave()
+        backpackMeal.text = ( "Repas : " .. carac.meal .. "\n" )
+        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
+    end
+
+    local function removeMeal()
+        if carac.meal >= 1 then carac.meal = carac.meal - 1 else carac.meal = 0 end
+        jsonSave()
+        backpackMeal.text = ( "Repas : " .. carac.meal .. "\n" )
+        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
+    end
+
+    -- Ajouter soustraire repas
+    local minus = display.newText( sceneGroup, "-", 252, 100, native.systemFont, 20 )
+    minus:setFillColor(0,0,0)
+    minus.anchorX = 0
+    minus.anchorY = 0
+    minus:addEventListener( "tap", removeMeal )
+
+    local plus = display.newText( sceneGroup, "+", 280, 100, native.systemFont, 20 )
+    plus:setFillColor(0,0,0)
+    plus.anchorX = 0
+    plus.anchorY = 0
+    plus:addEventListener( "tap", addMeal )
+
     -- Alimentation du tableau des objets du sac à dos (avec test sur le nombre d'objet -> max 8 repas inclus)
-    local obj = display.newText( sceneGroup, "\n", 40, 100, native.systemFont, 16 )
+    local obj = display.newText( sceneGroup, "\n", 40, 100, 200, 0, native.systemFont, 16 )
     obj:setFillColor(0,0,0)
     obj.anchorX = 0
     obj.anchorY = 0
@@ -148,6 +177,10 @@ function scene:create( event )
     addObject:setFillColor(0,0,0)
     addObject.anchorX = 0
     addObject:addEventListener("tap", addObjFunc)
+
+	-- Text field -> add object spec
+    addSpecObjField = native.newTextField( 130, 280, 180, 20 )
+	addSpecObjField:addEventListener( "userInput", textListener )
 end
 
 
@@ -189,6 +222,7 @@ function scene:destroy( event )
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
 	addObjField:removeSelf()
+	addSpecObjField:removeSelf()
 end
 
 
