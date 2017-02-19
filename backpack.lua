@@ -107,6 +107,38 @@ function scene:create( event )
     backpackMeal.anchorX = 0
     backpackMeal.anchorY = 0
 
+    local function addMeal()
+        if carac.charge < 8 then
+            carac.meal = carac.meal + 1
+            carac.charge = carac.charge + 1
+        else
+            carac.charge = 8
+        end
+        jsonSave()
+        backpackMeal.text = ( "Repas : " .. carac.meal .. "\n" )
+        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
+    end
+
+    local function removeMeal()
+        if carac.meal >= 1 then carac.meal = carac.meal - 1 else carac.meal = 0 end
+        jsonSave()
+        backpackMeal.text = ( "Repas : " .. carac.meal .. "\n" )
+        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
+    end
+
+    -- Ajouter soustraire repas
+    local minus = display.newText( sceneGroup, "-", 252, 100, native.systemFont, 20 )
+    minus:setFillColor(0,0,0)
+    minus.anchorX = 0
+    minus.anchorY = 0
+    minus:addEventListener( "tap", removeMeal )
+
+    local plus = display.newText( sceneGroup, "+", 280, 100, native.systemFont, 20 )
+    plus:setFillColor(0,0,0)
+    plus.anchorX = 0
+    plus.anchorY = 0
+    plus:addEventListener( "tap", addMeal )
+
     -- Alimentation du tableau des objets du sac à dos (avec test sur le nombre d'objet -> max 8 repas inclus)
     local obj = display.newText( sceneGroup, "\n", 40, 100, 200, 0, native.systemFont, 16 )
     obj:setFillColor(0,0,0)
