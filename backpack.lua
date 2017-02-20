@@ -64,7 +64,18 @@ function scene:create( event )
 		end
 	end
 
-    local function textListener( event )
+    -- +/- pics
+    local options_icons = {
+        width = 100,
+        height = 100,
+        numFrames = 6,
+        sheetContentWidth = 300,
+        sheetContentHeight = 200
+    }
+    local icons = graphics.newImageSheet( "pic/icons.png", options_icons )
+
+    -- listener pour champ de saisie
+    local function textListener( event )  --https://docs.coronalabs.com/api/library/native/newTextField.html
         if ( event.phase == "began" ) then
             -- User begins editing "defaultField"
 		elseif ( event.phase == "ended" or event.phase == "submitted" ) then
@@ -72,12 +83,13 @@ function scene:create( event )
             print( event.target.text )
             typedObject = event.target.text
         elseif ( event.phase == "editing" ) then
-        	--https://docs.coronalabs.com/api/library/native/newTextField.html
+        	print(event.text)
+            typedObject = event.text
         end
     end
 
 	-- Parchment background
-    local parch_background = display.newImageRect( sceneGroup, "pic/parch_background_warrior.png", 300, 556 )
+    local parch_background = display.newImageRect( sceneGroup, "pic/parch_background.png", 400, 700 )
     parch_background.x = display.contentCenterX
     parch_background.y = display.contentCenterY
 
@@ -127,16 +139,14 @@ function scene:create( event )
     end
 
     -- Ajouter soustraire repas
-    local minus = display.newText( sceneGroup, "-", 252, 100, native.systemFont, 20 )
-    minus:setFillColor(0,0,0)
-    minus.anchorX = 0
-    minus.anchorY = 0
+    local minus = display.newImageRect( sceneGroup, icons, 2,30, 30 )
+    minus.x = 230
+    minus.y = 110
     minus:addEventListener( "tap", removeMeal )
 
-    local plus = display.newText( sceneGroup, "+", 280, 100, native.systemFont, 20 )
-    plus:setFillColor(0,0,0)
-    plus.anchorX = 0
-    plus.anchorY = 0
+    local plus = display.newImageRect( sceneGroup, icons, 1, 30, 30 )
+    plus.x = 270
+    plus.y = 110
     plus:addEventListener( "tap", addMeal )
 
     -- Alimentation du tableau des objets du sac à dos (avec test sur le nombre d'objet -> max 8 repas inclus)
@@ -167,15 +177,16 @@ function scene:create( event )
 				table.insert(carac.obj,typedObject)
 				jsonSave()
 				addObjField.text = ""
+                typedObject = nil
 		end
 		obj.text = "\n"
 		displayObject()
 	end
 
     --Add object
-    local addObject = display.newText( sceneGroup, "+", 250, 76, native.systemFontBold, 24)
-    addObject:setFillColor(0,0,0)
-    addObject.anchorX = 0
+    local addObject = display.newImageRect( sceneGroup, icons, 4, 30, 30 )
+    addObject.x = 250
+    addObject.y = 80
     addObject:addEventListener("tap", addObjFunc)
 
 	-- Text field -> add object spec

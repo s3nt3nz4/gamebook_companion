@@ -75,7 +75,7 @@ function scene:create( event )
 	local kaiCheckbox = graphics.newImageSheet( "pic/checkbox-sprite.png", options_checkbox )
 
 	-- Parchment background
-	local parch_background = display.newImageRect( sceneGroup, "pic/parch_background_warrior.png", 300, 556 )
+	local parch_background = display.newImageRect( sceneGroup, "pic/parch_background.png", 400, 700 )
 	parch_background.x = display.contentCenterX
 	parch_background.y = display.contentCenterY
 
