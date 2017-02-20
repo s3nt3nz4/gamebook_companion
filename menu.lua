@@ -39,7 +39,7 @@ function scene:create( event )
 	-- Code here runs when the scene is first created but has not yet appeared on screen
 
 	-- Add background (member of sceneGroup)
-	local background = display.newImageRect( sceneGroup, "pic/parch_background.png", 300, 556 )
+	local background = display.newImageRect( sceneGroup, "pic/parch_background.png", 400, 700 )
 	background.x = display.contentCenterX
 	background.y = display.contentCenterY
 

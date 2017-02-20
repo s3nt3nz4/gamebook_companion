@@ -56,9 +56,19 @@ function scene:create( event )
 
     -- Charge la fiche perso
     loadSheet()
- --   print("\n\nHabileté : " .. carac.habil)
+
+    -- +/- pics
+    local options_icons = {
+        width = 100,
+        height = 100,
+        numFrames = 6,
+        sheetContentWidth = 300,
+        sheetContentHeight = 200
+    }
+    local icons = graphics.newImageSheet( "pic/icons.png", options_icons )
+
     -- Parchment background
-    local parch_background = display.newImageRect( sceneGroup, "pic/parch_background_warrior.png", 300, 556 )      
+    local parch_background = display.newImageRect( sceneGroup, "pic/parch_background.png", 400, 700 )      
     parch_background.x = display.contentCenterX
     parch_background.y = display.contentCenterY
 
@@ -162,14 +172,14 @@ function scene:create( event )
     end
 
     -- Ajouter soustraire PO
-    local minus = display.newText( poGroup, "-", 220, 238, native.systemFontBold, 32 )
-    minus:setFillColor(0,0,0)
-    minus.anchorX = 1
+    local minus = display.newImageRect( poGroup, icons, 2, 30, 30 )
+    minus.x = 210
+    minus.y = 240
     minus:addEventListener( "tap", removePO )
 
-    local plus = display.newText( poGroup, "+", 288, 238, native.systemFontBold, 28 )
-    plus:setFillColor(0,0,0)
-    plus.anchorX = 1
+    local plus = display.newImageRect( poGroup, icons, 1, 30, 30 )
+    plus.x = 280
+    plus.y = 240
     plus:addEventListener( "tap", addPO )
 
     sceneGroup:insert( poGroup )
