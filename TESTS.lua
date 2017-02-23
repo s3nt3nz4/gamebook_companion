@@ -7,6 +7,8 @@ local composer = require( "composer" )
 
 local scene = composer.newScene()
 
+local widget = require( "widget" )
+
 -- -----------------------------------------------------------------------------------
 -- Code outside of the scene event functions below will only be executed ONCE unless
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
@@ -55,7 +57,7 @@ function scene:create( event )
     -- Code here runs when the scene is first created but has not yet appeared on screen
 
     -- Parchment background
-    local parch_background = display.newImageRect( sceneGroup, "pic/parch_background.png", 300, 556 )
+    local parch_background = display.newImageRect( sceneGroup, "pic/parch_background.png", 400, 700 )
     parch_background.x = display.contentCenterX
     parch_background.y = display.contentCenterY
 
@@ -65,31 +67,35 @@ function scene:create( event )
     backToMenu.y = 0
     backToMenu:addEventListener( "tap", gotoMenu )
 
-    --test text input
-    local defaultBox
-     
-    local function textListener( event )
-     
-        if ( event.phase == "began" ) then
-            -- User begins editing "defaultBox"
-     
-        elseif ( event.phase == "ended" or event.phase == "submitted" ) then
-            -- Output resulting text from "defaultBox"
-            print( event.target.text )
-     
-        elseif ( event.phase == "editing" ) then
-            print( event.newCharacters )
-            print( event.oldText )
-            print( event.startPosition )
-            print( event.text )
-        end
+
+    -- TEST : https://coronalabs.com/blog/2013/04/16/lua-string-magic/
+    local function textWrap( str, limit, indent, indent1 )
+       limit = limit or 72
+       indent = indent or ""
+       indent1 = indent1 or indent
+
+       local here = 1 - #indent1
+       return indent1..str:gsub( "(%s+)()(%S+)()",
+          function( sp, st, word, fi )
+             if fi - here > limit then
+                here = st - #indent
+                return "\n"..indent..word
+             end
+          end )
     end
-     
-    -- Create text box
-    defaultBox = native.newTextBox( 200, 200, 280, 140 )
-    defaultBox.text = "This is line 1.\nAnd this is line2"
-    defaultBox.isEditable = true
-    defaultBox:addEventListener( "userInput", textListener )
+
+    local initialText = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+
+    local wrappedText = textWrap( initialText, 36, nil, "    " )
+
+    print( wrappedText )
+
+    local textBox = display.newRect( 30, 30, 640, 840 )
+    textBox:setFillColor( 200, 80, 50, 50 )
+    textBox.strokeWidth = 4 ; textBox:setStrokeColor( 200, 80, 50, 150 )
+
+    local myParagraph = display.newText( wrappedText, 66, 58, 580, 800, native.systemFont, 28 )
+
 
 end
 
