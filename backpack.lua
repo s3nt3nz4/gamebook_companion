@@ -52,6 +52,10 @@ function scene:create( event )
     -- Charge la fiche perso
     loadSheet()
 
+    -------------------------------------------------------------------------------------
+    -- scene create functions
+    -------------------------------------------------------------------------------------
+
 	-- Fonction de stockage de la fiche de perso dans un fichier json
 	local function jsonSave()
 		--calcul de la charge du sac à dos :
@@ -65,6 +69,20 @@ function scene:create( event )
 		end
 	end
 
+    -- listener pour champ de saisie
+    local function textListener( event )  --https://docs.coronalabs.com/api/library/native/newTextField.html
+        if ( event.phase == "began" ) then
+            -- User begins editing "defaultField"
+        elseif ( event.phase == "ended" or event.phase == "submitted" ) then
+            -- Output resulting text from "defaultField"
+            print( event.target.text )
+            typedObject = event.target.text
+        elseif ( event.phase == "editing" ) then
+            print(event.text)
+            typedObject = event.text
+        end
+    end
+    
     -- +/- pics
     local options_icons = {
         width = 100,
@@ -75,19 +93,55 @@ function scene:create( event )
     }
     icons = graphics.newImageSheet( "pic/icons.png", options_icons )
 
-    -- listener pour champ de saisie
-    local function textListener( event )  --https://docs.coronalabs.com/api/library/native/newTextField.html
-        if ( event.phase == "began" ) then
-            -- User begins editing "defaultField"
-		elseif ( event.phase == "ended" or event.phase == "submitted" ) then
-		    -- Output resulting text from "defaultField"
-            print( event.target.text )
-            typedObject = event.target.text
-        elseif ( event.phase == "editing" ) then
-        	print(event.text)
-            typedObject = event.text
+    local function addMeal()
+        if carac.charge < 8 then
+            carac.meal = carac.meal + 1
+            carac.charge = carac.charge + 1
+        else
+            carac.charge = 8
         end
+        jsonSave()
+        backpackMeal.text = ( "Repas : " .. carac.meal .. "\n" )
+        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
     end
+
+    local function removeMeal()
+        if carac.meal >= 1 then carac.meal = carac.meal - 1 else carac.meal = 0 end
+        jsonSave()
+        backpackMeal.text = ( "Repas : " .. carac.meal .. "\n" )
+        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
+    end
+
+    -- Fonction de suppression des objets
+    local function deleteObjFunc()
+        print("deleteObjFunc : \n")        
+    end
+
+    local function displayObject()
+        for i=2, #carac.obj do
+            obj.text = obj.text .. "      " .. carac.obj[i] .. "\v"
+            obj.anchorY = 0
+        end
+        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
+    end
+
+    -- Fonction addObject
+    local function addObjFunc()
+        if carac.charge >= 8 then
+            print("ERROR NUMBER OF OBJECTS > 8 !!!")
+            else
+                table.insert(carac.obj,typedObject)
+                jsonSave()
+                addObjField.text = ""
+                typedObject = nil
+        end
+        obj.text = "\n"
+        displayObject()
+    end
+
+    -------------------------------------------------------------------------------------
+    -- scene create display and listeners
+    -------------------------------------------------------------------------------------
 
 	-- Parchment background
     parch_background = display.newImageRect( sceneGroup, "pic/parch_background.png", 400, 700 )
@@ -120,25 +174,6 @@ function scene:create( event )
     backpackMeal.anchorX = 0
     backpackMeal.anchorY = 0
 
-    local function addMeal()
-        if carac.charge < 8 then
-            carac.meal = carac.meal + 1
-            carac.charge = carac.charge + 1
-        else
-            carac.charge = 8
-        end
-        jsonSave()
-        backpackMeal.text = ( "Repas : " .. carac.meal .. "\n" )
-        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
-    end
-
-    local function removeMeal()
-        if carac.meal >= 1 then carac.meal = carac.meal - 1 else carac.meal = 0 end
-        jsonSave()
-        backpackMeal.text = ( "Repas : " .. carac.meal .. "\n" )
-        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
-    end
-
     -- Ajouter soustraire repas
     minus = display.newImageRect( sceneGroup, icons, 2,30, 30 )
     minus.x = 230
@@ -150,10 +185,6 @@ function scene:create( event )
     plus.y = 110
     plus:addEventListener( "tap", addMeal )
 
-    -- Fonction de suppression des objets
-    local function deleteObjFunc()
-        print("deleteObjFunc : \n")        
-    end
 
     -- Bouton de suppression des objets
     local y = 117
@@ -168,39 +199,19 @@ function scene:create( event )
         deleteObj[i]:addEventListener( "tap", deleteObjFunc )
     end
 
+
     -- Alimentation du tableau des objets du sac à dos (avec test sur le nombre d'objet -> max 8 repas inclus)
     obj = display.newText( sceneGroup, "\n", 40, 100, native.systemFont, 16 )
     obj:setFillColor(0,0,0)
     obj.anchorX = 0
     obj.anchorY = 0
 
-    local function displayObject()
-        for i=2, #carac.obj do
-            obj.text = obj.text .. "      " .. carac.obj[i] .. "\v"
-            obj.anchorY = 0
-        end
-        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
-    end
 
     if carac.charge > 8 then
     	print ("ERROR : NUMBER OF OBJECTS > 8 !!!")
     else
     	displayObject()
     end
-
-	-- Fonction addObject
-	local function addObjFunc()
-		if carac.charge >= 8 then
-			print("ERROR NUMBER OF OBJECTS > 8 !!!")
-			else
-				table.insert(carac.obj,typedObject)
-				jsonSave()
-				addObjField.text = ""
-                typedObject = nil
-		end
-		obj.text = "\n"
-		displayObject()
-	end
 
     --Add object
     addObject = display.newImageRect( sceneGroup, icons, 4, 30, 30 )
