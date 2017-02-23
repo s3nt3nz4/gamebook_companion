@@ -35,6 +35,10 @@ local function loadSheet()
     end
 end
 
+-- Déclaration des variables
+local icons, parch_background, backToMenu, title, typedObject, backpack, backpackMeal, minus, plus, obj, addObject
+local deleteObj = {}
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -47,9 +51,6 @@ function scene:create( event )
 
     -- Charge la fiche perso
     loadSheet()
-
-    -- declare text field objects
-    local typedObject
 
 	-- Fonction de stockage de la fiche de perso dans un fichier json
 	local function jsonSave()
@@ -72,7 +73,7 @@ function scene:create( event )
         sheetContentWidth = 300,
         sheetContentHeight = 200
     }
-    local icons = graphics.newImageSheet( "pic/icons.png", options_icons )
+    icons = graphics.newImageSheet( "pic/icons.png", options_icons )
 
     -- listener pour champ de saisie
     local function textListener( event )  --https://docs.coronalabs.com/api/library/native/newTextField.html
@@ -89,23 +90,23 @@ function scene:create( event )
     end
 
 	-- Parchment background
-    local parch_background = display.newImageRect( sceneGroup, "pic/parch_background.png", 400, 700 )
+    parch_background = display.newImageRect( sceneGroup, "pic/parch_background.png", 400, 700 )
     parch_background.x = display.contentCenterX
     parch_background.y = display.contentCenterY
 
     -- Retour au menu
-    local backToMenu = display.newImageRect(sceneGroup, "pic/arrowBack.png", 30, 30)
+    backToMenu = display.newImageRect(sceneGroup, "pic/arrowBack.png", 30, 30)
     backToMenu.x = 40
     backToMenu.y = 0
     backToMenu:addEventListener( "tap", gotoAdventureSheet )
 
     -- Titre
-    local title = display.newText( sceneGroup, "Inventaire", 40, 10, native.systemFontBold, 20 )
+    title = display.newText( sceneGroup, "Inventaire", 40, 10, native.systemFontBold, 20 )
     title:setFillColor(0,0,0)
     title.x = display.contentCenterX
 
     -- Sac à dos
-    local backpack = display.newText( sceneGroup, "Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n", 40, 60, native.systemFont, 18 )
+    backpack = display.newText( sceneGroup, "Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n", 40, 60, native.systemFont, 18 )
     backpack:setFillColor(0,0,0)
     backpack.anchorX = 0
 
@@ -114,7 +115,7 @@ function scene:create( event )
 	addObjField:addEventListener( "userInput", textListener )
 
     -- Repas
-    local backpackMeal = display.newText( sceneGroup, "Repas : " .. carac.meal .. "\n", 40, 100, 250, 0, native.systemFont, 16 )
+    backpackMeal = display.newText( sceneGroup, "Repas : " .. carac.meal .. "\n", 40, 100, 250, 0, native.systemFont, 16 )
     backpackMeal:setFillColor(0,0,0)
     backpackMeal.anchorX = 0
     backpackMeal.anchorY = 0
@@ -139,25 +140,43 @@ function scene:create( event )
     end
 
     -- Ajouter soustraire repas
-    local minus = display.newImageRect( sceneGroup, icons, 2,30, 30 )
+    minus = display.newImageRect( sceneGroup, icons, 2,30, 30 )
     minus.x = 230
     minus.y = 110
     minus:addEventListener( "tap", removeMeal )
 
-    local plus = display.newImageRect( sceneGroup, icons, 1, 30, 30 )
+    plus = display.newImageRect( sceneGroup, icons, 1, 30, 30 )
     plus.x = 270
     plus.y = 110
     plus:addEventListener( "tap", addMeal )
 
+    -- Fonction de suppression des objets
+    local function deleteObjFunc()
+        print("deleteObjFunc : \n")        
+    end
+
+    -- Bouton de suppression des objets
+    local y = 117
+    for i=1, 8 do
+        deleteObj[i] = display.newImageRect( sceneGroup, icons, 2, 23, 23 )
+        deleteObj[i].anchorX = 0
+        deleteObj[i].anchorY = 0
+        deleteObj[i].x = 40
+        deleteObj[i].y = y
+        y = y + 19
+        print ("i=" .. i .. " | y=" .. y)
+        deleteObj[i]:addEventListener( "tap", deleteObjFunc )
+    end
+
     -- Alimentation du tableau des objets du sac à dos (avec test sur le nombre d'objet -> max 8 repas inclus)
-    local obj = display.newText( sceneGroup, "\n", 40, 100, 200, 0, native.systemFont, 16 )
+    obj = display.newText( sceneGroup, "\n", 40, 100, native.systemFont, 16 )
     obj:setFillColor(0,0,0)
     obj.anchorX = 0
     obj.anchorY = 0
 
     local function displayObject()
         for i=2, #carac.obj do
-            obj.text = obj.text .. carac.obj[i] .. "\n"
+            obj.text = obj.text .. "      " .. carac.obj[i] .. "\v"
             obj.anchorY = 0
         end
         backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
@@ -184,13 +203,13 @@ function scene:create( event )
 	end
 
     --Add object
-    local addObject = display.newImageRect( sceneGroup, icons, 4, 30, 30 )
+    addObject = display.newImageRect( sceneGroup, icons, 4, 30, 30 )
     addObject.x = 250
     addObject.y = 80
     addObject:addEventListener("tap", addObjFunc)
 
 	-- Text field -> add object spec
-    addSpecObjField = native.newTextField( 130, 280, 180, 20 )
+    addSpecObjField = native.newTextField( 130, 320, 180, 20 )
 	addSpecObjField:addEventListener( "userInput", textListener )
 end
 
