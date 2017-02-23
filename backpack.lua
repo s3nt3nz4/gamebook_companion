@@ -112,17 +112,39 @@ function scene:create( event )
         backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
     end
 
-    -- Fonction de suppression des objets
-    local function deleteObjFunc()
-        print("deleteObjFunc : \n")        
-    end
-
     local function displayObject()
         for i=2, #carac.obj do
             obj.text = obj.text .. "      " .. carac.obj[i] .. "\v"
             obj.anchorY = 0
         end
         backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
+    end
+
+    -- Fonction de suppression des objets
+    local function deleteObjFunc(event)
+        print("deleteObjFunc : "..event.target.num)
+        display.remove(obj)
+
+        table.remove(carac.obj, event.target.num)
+        deleteObj[carac.charge].isVisible = false
+        
+        jsonSave()
+        
+        obj = display.newText( sceneGroup, "\n", 40, 100, native.systemFont, 16 )
+        obj:setFillColor(0,0,0)
+        obj.anchorX = 0
+        obj.anchorY = 0
+        displayObject()
+    end
+
+    -- Hide delete button
+    local function hideDeleteButton()
+        for i=2, 9 do
+            deleteObj[i].isVisible = true
+        end
+        for i=(carac.charge+1), 9 do
+            deleteObj[i].isVisible = false
+        end
     end
 
     -- Fonction addObject
@@ -134,10 +156,12 @@ function scene:create( event )
                 jsonSave()
                 addObjField.text = ""
                 typedObject = nil
+                hideDeleteButton()
         end
         obj.text = "\n"
         displayObject()
     end
+
 
     -------------------------------------------------------------------------------------
     -- scene create display and listeners
@@ -169,7 +193,7 @@ function scene:create( event )
 	addObjField:addEventListener( "userInput", textListener )
 
     -- Repas
-    backpackMeal = display.newText( sceneGroup, "Repas : " .. carac.meal .. "\n", 40, 100, 250, 0, native.systemFont, 16 )
+    backpackMeal = display.newText( sceneGroup, "Repas : " .. carac.meal .. "\n", 140, 100, 250, 0, native.systemFont, 16 )
     backpackMeal:setFillColor(0,0,0)
     backpackMeal.anchorX = 0
     backpackMeal.anchorY = 0
@@ -184,20 +208,6 @@ function scene:create( event )
     plus.x = 270
     plus.y = 110
     plus:addEventListener( "tap", addMeal )
-
-
-    -- Bouton de suppression des objets
-    local y = 117
-    for i=1, 8 do
-        deleteObj[i] = display.newImageRect( sceneGroup, icons, 2, 23, 23 )
-        deleteObj[i].anchorX = 0
-        deleteObj[i].anchorY = 0
-        deleteObj[i].x = 40
-        deleteObj[i].y = y
-        y = y + 19
-        print ("i=" .. i .. " | y=" .. y)
-        deleteObj[i]:addEventListener( "tap", deleteObjFunc )
-    end
 
 
     -- Alimentation du tableau des objets du sac à dos (avec test sur le nombre d'objet -> max 8 repas inclus)
@@ -222,6 +232,23 @@ function scene:create( event )
 	-- Text field -> add object spec
     addSpecObjField = native.newTextField( 130, 320, 180, 20 )
 	addSpecObjField:addEventListener( "userInput", textListener )
+
+    -- affichage des boutons de suppression
+    local y = 117
+    for i=2, 9 do
+        deleteObj[i] = display.newImageRect( sceneGroup, icons, 2, 23, 23 )
+        deleteObj[i].anchorX = 0
+        deleteObj[i].anchorY = 0
+        deleteObj[i].x = 40
+        deleteObj[i].y = y
+        deleteObj[i].num = i
+        y = y + 19
+        print ("i=" .. i .. " | y=" .. y)
+        deleteObj[i]:addEventListener( "tap", deleteObjFunc )
+    end
+
+    hideDeleteButton()
+
 end
 
 
