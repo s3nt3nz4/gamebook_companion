@@ -114,7 +114,7 @@ function scene:create( event )
 
     local function displayObject()
         for i=2, #carac.obj do
-            obj.text = obj.text .. "      " .. carac.obj[i] .. "\v"
+            obj.text = obj.text .. "      " .. carac.obj[i] .. "\n"
             obj.anchorY = 0
         end
         backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
@@ -126,7 +126,7 @@ function scene:create( event )
         display.remove(obj)
 
         table.remove(carac.obj, event.target.num)
-        deleteObj[carac.charge].isVisible = false
+        deleteObj[#carac.obj+1].isVisible = false
         
         jsonSave()
         
@@ -142,7 +142,8 @@ function scene:create( event )
         for i=2, 9 do
             deleteObj[i].isVisible = true
         end
-        for i=(carac.charge+1), 9 do
+        print("carac.charge dans hideDeleteButton : "..carac.charge)
+        for i=(#carac.obj+1), 9 do
             deleteObj[i].isVisible = false
         end
     end
