@@ -36,8 +36,9 @@ local function loadSheet()
 end
 
 -- Déclaration des variables
-local icons, parch_background, backToMenu, title, typedObject, backpack, backpackMeal, minus, plus, obj, addObject
+local icons, parch_background, backToMenu, title, typedObject, backpack, backpackMeal, minus, plus, obj, addObject, addObjectSpe, objSpe
 local deleteObj = {}
+local deleteSpeObj = {}
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -117,7 +118,14 @@ function scene:create( event )
             obj.text = obj.text .. "      " .. carac.obj[i] .. "\n"
             obj.anchorY = 0
         end
-        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
+        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n") --free backpack space counter
+    end
+
+    local function displaySpecObject()
+        for i=1, #carac.specObj do
+            objSpe.text = objSpe.text .. "      " .. carac.specObj[i] .. "\n"
+            objSpe.anchorY = 0
+        end
     end
 
     -- Fonction de suppression des objets
@@ -130,12 +138,28 @@ function scene:create( event )
         
         jsonSave()
         
-        obj = display.newText( sceneGroup, "\n", 40, 100, native.systemFont, 16 )
+        obj = display.newText( sceneGroup, "\n", 40, 110, native.systemFont, 18 )
         obj:setFillColor(0,0,0)
         obj.anchorX = 0
         obj.anchorY = 0
         displayObject()
     end
+
+    -- Fonction de suppression des objets
+    local function deleteSpecObjFunc(event)
+        display.remove(objSpe)
+
+        table.remove(carac.specObj, event.target.num)
+        deleteSpeObj[#carac.specObj+1].isVisible = false
+        
+        jsonSave()
+        
+        objSpe = display.newText( sceneGroup, "\n", 40, 320, native.systemFont, 18 )
+        objSpe:setFillColor(0,0,0)
+        objSpe.anchorX = 0
+        objSpe.anchorY = 0
+        displaySpecObject()
+    end    
 
     -- Hide delete button
     local function hideDeleteButton()
@@ -145,6 +169,16 @@ function scene:create( event )
         print("carac.charge dans hideDeleteButton : "..carac.charge)
         for i=(#carac.obj+1), 9 do
             deleteObj[i].isVisible = false
+        end
+    end
+
+    -- Hide delete button
+    local function hideDeleteSpeButton()
+        for i=1, 9 do
+            deleteSpeObj[i].isVisible = true
+        end
+        for i=(#carac.specObj+1), 9 do
+            deleteSpeObj[i].isVisible = false
         end
     end
 
@@ -161,6 +195,17 @@ function scene:create( event )
         end
         obj.text = "\n"
         displayObject()
+    end
+
+    -- Fonction add special object
+    local function addObjSpeFunc()
+        table.insert(carac.specObj,typedObject)
+        jsonSave()
+        addSpecObjField.text = ""
+        typedObject = nil
+        hideDeleteSpeButton() -- pour cacher le bouton de suppression
+        objSpe.text = "\n"
+        displaySpecObject()
     end
 
 
@@ -194,29 +239,28 @@ function scene:create( event )
 	addObjField:addEventListener( "userInput", textListener )
 
     -- Repas
-    backpackMeal = display.newText( sceneGroup, "Repas : " .. carac.meal .. "\n", 140, 100, 250, 0, native.systemFont, 16 )
+    backpackMeal = display.newText( sceneGroup, "Repas : " .. carac.meal .. "\n", 120, 100, 250, 0, native.systemFont, 18 )
     backpackMeal:setFillColor(0,0,0)
     backpackMeal.anchorX = 0
     backpackMeal.anchorY = 0
 
     -- Ajouter soustraire repas
     minus = display.newImageRect( sceneGroup, icons, 2,30, 30 )
-    minus.x = 230
+    minus.x = 100
     minus.y = 110
     minus:addEventListener( "tap", removeMeal )
 
     plus = display.newImageRect( sceneGroup, icons, 1, 30, 30 )
-    plus.x = 270
+    plus.x = 215
     plus.y = 110
     plus:addEventListener( "tap", addMeal )
 
 
     -- Alimentation du tableau des objets du sac à dos (avec test sur le nombre d'objet -> max 8 repas inclus)
-    obj = display.newText( sceneGroup, "\n", 40, 100, native.systemFont, 16 )
+    obj = display.newText( sceneGroup, "\n", 40, 110, native.systemFont, 18 )
     obj:setFillColor(0,0,0)
     obj.anchorX = 0
     obj.anchorY = 0
-
 
     if carac.charge > 8 then
     	print ("ERROR : NUMBER OF OBJECTS > 8 !!!")
@@ -230,26 +274,60 @@ function scene:create( event )
     addObject.y = 80
     addObject:addEventListener("tap", addObjFunc)
 
-	-- Text field -> add object spec
-    addSpecObjField = native.newTextField( 130, 320, 180, 20 )
-	addSpecObjField:addEventListener( "userInput", textListener )
-
     -- affichage des boutons de suppression
-    local y = 117
+    local y = 131
     for i=2, 9 do
-        deleteObj[i] = display.newImageRect( sceneGroup, icons, 2, 23, 23 )
+        deleteObj[i] = display.newImageRect( sceneGroup, icons, 2, 25, 25 )
         deleteObj[i].anchorX = 0
         deleteObj[i].anchorY = 0
         deleteObj[i].x = 40
         deleteObj[i].y = y
         deleteObj[i].num = i
-        y = y + 19
-        print ("i=" .. i .. " | y=" .. y)
+        y = y + 21
         deleteObj[i]:addEventListener( "tap", deleteObjFunc )
     end
 
     hideDeleteButton()
 
+    -- Alimentation du tableau des objets spéciaux
+    objSpe = display.newText( sceneGroup, "\n", 40, 320, native.systemFont, 18 )
+    objSpe:setFillColor(0,0,0)
+    objSpe.anchorX = 0
+    objSpe.anchorY = 0
+    displaySpecObject()
+
+    --Add object
+    addObjectSpe = display.newImageRect( sceneGroup, icons, 4, 30, 30 )
+    addObjectSpe.x = 250
+    addObjectSpe.y = 320
+    addObjectSpe:addEventListener("tap", addObjSpeFunc)
+
+    -- Text field -> add object spec
+    addSpecObjField = native.newTextField( 130, 320, 180, 20 )
+    addSpecObjField:addEventListener( "userInput", textListener )
+
+    -- affichage des boutons de suppression des objets spéciaux
+    local ySpe = 341
+    for i=1, 9 do
+        deleteSpeObj[i] = display.newImageRect( sceneGroup, icons, 2, 25, 25 )
+        deleteSpeObj[i].anchorX = 0
+        deleteSpeObj[i].anchorY = 0
+        deleteSpeObj[i].x = 40
+        deleteSpeObj[i].y = ySpe
+        deleteSpeObj[i].num = i
+        ySpe = ySpe + 21
+        deleteSpeObj[i]:addEventListener( "tap", deleteSpecObjFunc )
+    end
+
+    hideDeleteSpeButton()
+
+    --[[ test charge à l'ouverture
+    if carac.charge > 8 then
+        print ("ERROR : NUMBER OF OBJECTS > 8 !!!")
+    else
+        displayObject()
+    end
+    ]]
 end
 
 
