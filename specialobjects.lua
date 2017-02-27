@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------------
 --				                         
--- Lone Wolf : backpack.lua	       
+-- Lone Wolf : specialobjects.lua	       
 --				                          
 -------------------------------------------------------------------------------------
 
@@ -36,8 +36,8 @@ local function loadSheet()
 end
 
 -- Déclaration des variables
-local icons, parch_background, backToMenu, title, typedObject, backpack, backpackMeal, minus, plus, obj, addObject, addObjField
-local deleteObj = {}
+local icons, parch_background, backToMenu, title, typedObject, addObjectSpe, objSpe, addSpecObjField
+local deleteSpeObj = {}
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -93,78 +93,51 @@ function scene:create( event )
     }
     icons = graphics.newImageSheet( "pic/icons.png", options_icons )
 
-    local function addMeal()
-        if carac.charge < 8 then
-            carac.meal = carac.meal + 1
-            carac.charge = carac.charge + 1
-        else
-            carac.charge = 8
+
+    local function displaySpecObject()
+        for i=1, #carac.specObj do
+            objSpe.text = objSpe.text .. "      " .. carac.specObj[i] .. "\n"
+            objSpe.anchorY = 0
         end
-        jsonSave()
-        backpackMeal.text = ( "Repas : " .. carac.meal .. "\n" )
-        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
     end
-
-    local function removeMeal()
-        if carac.meal >= 1 then carac.meal = carac.meal - 1 else carac.meal = 0 end
-        jsonSave()
-        backpackMeal.text = ( "Repas : " .. carac.meal .. "\n" )
-        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n")
-    end
-
-    local function displayObject()
-        for i=2, #carac.obj do
-            obj.text = obj.text .. "      " .. carac.obj[i] .. "\n"
-            obj.anchorY = 0
-        end
-        backpack.text = ("Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n") --free backpack space counter
-    end
-
 
     -- Fonction de suppression des objets
-    local function deleteObjFunc(event)
-        print("deleteObjFunc : "..event.target.num)
-        display.remove(obj)
+    local function deleteSpecObjFunc(event)
+        display.remove(objSpe)
 
-        table.remove(carac.obj, event.target.num)
-        deleteObj[#carac.obj+1].isVisible = false
+        table.remove(carac.specObj, event.target.num)
+        deleteSpeObj[#carac.specObj+1].isVisible = false
         
         jsonSave()
         
-        obj = display.newText( sceneGroup, "\n", 40, 110, native.systemFont, 18 )
-        obj:setFillColor(0,0,0)
-        obj.anchorX = 0
-        obj.anchorY = 0
-        displayObject()
-    end
- 
+        objSpe = display.newText( sceneGroup, "\n", 40, 90, native.systemFont, 18 )
+        objSpe:setFillColor(0,0,0)
+        objSpe.anchorX = 0
+        objSpe.anchorY = 0
+        displaySpecObject()
+    end    
 
     -- Hide delete button
-    local function hideDeleteButton()
-        for i=2, 9 do
-            deleteObj[i].isVisible = true
+    local function hideDeleteSpeButton()
+        for i=1, 9 do
+            deleteSpeObj[i].isVisible = true
         end
-        print("carac.charge dans hideDeleteButton : "..carac.charge)
-        for i=(#carac.obj+1), 9 do
-            deleteObj[i].isVisible = false
+        for i=(#carac.specObj+1), 9 do
+            deleteSpeObj[i].isVisible = false
         end
     end
 
-
-    -- Fonction addObject
-    local function addObjFunc()
-        if carac.charge >= 8 then
-            print("ERROR NUMBER OF OBJECTS > 8 !!!")
-            else
-                table.insert(carac.obj,typedObject)
-                jsonSave()
-                addObjField.text = ""
-                typedObject = nil
-                hideDeleteButton()
-        end
-        obj.text = "\n"
-        displayObject()
+    -- Fonction add special object
+    local function addObjSpeFunc()
+        table.insert(carac.specObj,typedObject)
+        jsonSave()
+        addSpecObjField.text = ""
+        typedObject = nil
+        hideDeleteSpeButton() -- pour cacher le bouton de suppression
+        objSpe.text = "\n"
+        displaySpecObject()
     end
+
 
     -------------------------------------------------------------------------------------
     -- scene create display and listeners
@@ -182,70 +155,42 @@ function scene:create( event )
     backToMenu:addEventListener( "tap", gotoAdventureSheet )
 
     -- Titre
-    title = display.newText( sceneGroup, "Inventaire", 40, 10, native.systemFontBold, 20 )
+    title = display.newText( sceneGroup, "Objets spéciaux", 40, 10, native.systemFontBold, 20 )
     title:setFillColor(0,0,0)
     title.x = display.contentCenterX
 
-    -- Sac à dos
-    backpack = display.newText( sceneGroup, "Sac à dos ( ".. 8-carac.charge .." place(s) libre(s) ) : \n", 40, 60, native.systemFont, 18 )
-    backpack:setFillColor(0,0,0)
-    backpack.anchorX = 0
+    -- Text field -> add object spec
+    addSpecObjField = native.newTextField( 130, 80, 180, 20 )
+    addSpecObjField:addEventListener( "userInput", textListener )
 
-    -- Text field -> add object
-    addObjField = native.newTextField( 130, 80, 180, 20 )
-	addObjField:addEventListener( "userInput", textListener )
+    -- Alimentation du tableau des objets spéciaux
+    objSpe = display.newText( sceneGroup, "\n", 40, 90, native.systemFont, 18 )
+    objSpe:setFillColor(0,0,0)
+    objSpe.anchorX = 0
+    objSpe.anchorY = 0
+    displaySpecObject()
 
-    -- Repas
-    backpackMeal = display.newText( sceneGroup, "Repas : " .. carac.meal .. "\n", 120, 100, 250, 0, native.systemFont, 18 )
-    backpackMeal:setFillColor(0,0,0)
-    backpackMeal.anchorX = 0
-    backpackMeal.anchorY = 0
-
-    -- Ajouter soustraire repas
-    minus = display.newImageRect( sceneGroup, icons, 2,30, 30 )
-    minus.x = 100
-    minus.y = 110
-    minus:addEventListener( "tap", removeMeal )
-
-    plus = display.newImageRect( sceneGroup, icons, 1, 30, 30 )
-    plus.x = 215
-    plus.y = 110
-    plus:addEventListener( "tap", addMeal )
+    --Add special object
+    addObjectSpe = display.newImageRect( sceneGroup, icons, 4, 30, 30 )
+    addObjectSpe.x = 250
+    addObjectSpe.y = 80
+    addObjectSpe:addEventListener("tap", addObjSpeFunc)
 
 
-    -- Alimentation du tableau des objets du sac à dos (avec test sur le nombre d'objet -> max 8 repas inclus)
-    obj = display.newText( sceneGroup, "\n", 40, 110, native.systemFont, 18 )
-    obj:setFillColor(0,0,0)
-    obj.anchorX = 0
-    obj.anchorY = 0
-
-    if carac.charge > 8 then
-    	print ("ERROR : NUMBER OF OBJECTS > 8 !!!")
-    else
-    	displayObject()
-    end
-
-    --Add object
-    addObject = display.newImageRect( sceneGroup, icons, 4, 30, 30 )
-    addObject.x = 250
-    addObject.y = 80
-    addObject:addEventListener("tap", addObjFunc)
-
-    -- affichage des boutons de suppression
-    local y = 131
-    for i=2, 9 do
-        deleteObj[i] = display.newImageRect( sceneGroup, icons, 2, 25, 25 )
-        deleteObj[i].anchorX = 0
-        deleteObj[i].anchorY = 0
-        deleteObj[i].x = 40
-        deleteObj[i].y = y
-        deleteObj[i].num = i
+    -- affichage des boutons de suppression des objets spéciaux
+    local y = 111
+    for i=1, 9 do
+        deleteSpeObj[i] = display.newImageRect( sceneGroup, icons, 2, 25, 25 )
+        deleteSpeObj[i].anchorX = 0
+        deleteSpeObj[i].anchorY = 0
+        deleteSpeObj[i].x = 40
+        deleteSpeObj[i].y = y
+        deleteSpeObj[i].num = i
         y = y + 21
-        deleteObj[i]:addEventListener( "tap", deleteObjFunc )
+        deleteSpeObj[i]:addEventListener( "tap", deleteSpecObjFunc )
     end
 
-    hideDeleteButton()
-
+    hideDeleteSpeButton()
 end
 
 
@@ -276,7 +221,7 @@ function scene:hide( event )
 
 	elseif ( phase == "did" ) then
 		-- Code here runs immediately after the scene goes entirely off screen
-
+        addSpecObjField:removeSelf()
 	end
 end
 
@@ -286,7 +231,7 @@ function scene:destroy( event )
 
 	local sceneGroup = self.view
 	-- Code here runs prior to the removal of scene's view
-	addObjField:removeSelf()
+	--addSpecObjField:removeSelf()
 end
 
 

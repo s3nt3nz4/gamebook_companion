@@ -67,7 +67,7 @@ function scene:create( event )
     backToMenu.y = 0
     backToMenu:addEventListener( "tap", gotoMenu )
 
-
+--[[
     -- TEST : https://coronalabs.com/blog/2013/04/16/lua-string-magic/
     local function textWrap( str, limit, indent, indent1 )
        limit = limit or 72
@@ -95,7 +95,7 @@ function scene:create( event )
     textBox.strokeWidth = 4 ; textBox:setStrokeColor( 200, 80, 50, 150 )
 
     local myParagraph = display.newText( wrappedText, 66, 58, 580, 800, native.systemFont, 28 )
-
+]]
 
 end
 
