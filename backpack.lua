@@ -156,12 +156,13 @@ function scene:create( event )
         if carac.charge >= 8 then
             print("ERROR NUMBER OF OBJECTS > 8 !!!")
             else
-                table.insert(carac.obj,typedObject)
+                table.insert(carac.obj,typedObject) -- Ajouter des champs pour expliquer la fonction de l'item
                 jsonSave()
                 addObjField.text = ""
                 typedObject = nil
                 hideDeleteButton()
         end
+        -- créer une fonction qui va tester si l'item modifie les caractéristiques du héro et le cas échéant les mettre à jour.
         obj.text = "\n"
         displayObject()
     end

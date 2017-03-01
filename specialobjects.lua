@@ -96,7 +96,8 @@ function scene:create( event )
 
     local function displaySpecObject()
         for i=1, #carac.specObj do
-            objSpe.text = objSpe.text .. "      " .. carac.specObj[i] .. "\n"
+            print (carac.specObj[i][1])
+            objSpe.text = objSpe.text .. "      " .. carac.specObj[i][1] .. " " .. carac.specObj[i][3].." "..carac.specObj[i][2] .. "\n"
             objSpe.anchorY = 0
         end
     end
@@ -129,7 +130,7 @@ function scene:create( event )
 
     -- Fonction add special object
     local function addObjSpeFunc()
-        table.insert(carac.specObj,typedObject)
+        table.insert(carac.specObj,{typedObject,"",""})
         jsonSave()
         addSpecObjField.text = ""
         typedObject = nil

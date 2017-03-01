@@ -27,6 +27,11 @@ local function gotoSpecialObjects()
     composer.gotoScene( "specialobjects" )
 end
 
+local function gotoFight()
+    composer.removeScene( "fight" )
+    composer.gotoScene( "fight" )
+end
+
 local json = require("json")
 local carac = {}
 local filePath = system.pathForFile( "adventureSheet.json", system.DocumentsDirectory )
@@ -46,7 +51,7 @@ end
 
 
 -- Déclaration des variables
-local options_icons, icons, parch_background, backToMenu, title, habil, endu, kai, weapon, sack, po, minus, plus, backpack, backpackMeal, tapToOpen, obj, backpackSpecial
+local options_icons, icons, parch_background, backToMenu, title, habil, endu, kai, weapon, sack, po, minus, plus, backpack, backpackMeal, tapToOpen, obj, backpackSpecial, fightButton
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -145,7 +150,7 @@ function scene:create( event )
     habil.anchorX = 0
 
     -- Endurance
-     endu = display.newText( sceneGroup, "Endurance : "..carac.endu, 160, 50, native.systemFont, 18 )
+    endu = display.newText( sceneGroup, "Endurance : "..carac.endu, 160, 50, native.systemFont, 18 )
     endu:setFillColor(0,0,0)
     endu.anchorX = 0
 
@@ -236,6 +241,12 @@ function scene:create( event )
     objSpe.anchorX = 0
 
     sceneGroup:insert( backpackGroup )
+
+    -- Bouton Combat
+    fightButton = display.newText(sceneGroup, "Combat", 40, 480, native.systemFontBold, 24)
+    fightButton:setFillColor(0,0,0)
+    fightButton.x = display.contentCenterX
+    fightButton:addEventListener( "tap", gotoFight )
 
     -- move bags
     backpackGroup.y = -20

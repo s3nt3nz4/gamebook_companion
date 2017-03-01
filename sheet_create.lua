@@ -32,7 +32,7 @@ local carac = {
 	po = "?",
 	weapon = {"Hache"},
 	meal = 1,
-	specObj = {"Carte géographique"},
+	specObj = {{"Carte géographique","",""}},
 	obj = {""},
 	charge = 0,
 	kai = {}
@@ -136,7 +136,7 @@ function scene:create( event )
   local function launchDice()
 		carac.weapon = {"Hache"}
 		carac.meal = 1
-		carac.specObj = {"Carte géographique"}
+		carac.specObj = {{"Carte géographique","",""}}
 		carac.obj = {" "}
 		carac.po = "?"
 		carac.habil = math.random(9)+11
@@ -152,16 +152,16 @@ function scene:create( event )
 			table.insert( carac.weapon, "Epée" )
 			obj.text = "- Objet de départ :\n   " .. carac.weapon[2]
 		elseif rndObj == 1 then
-			table.insert( carac.specObj, "Casque" )
+			table.insert( carac.specObj, {"Casque","endu",2} )
 			carac.endu = carac.endu + 2
-			obj.text = "- Objet de départ :\n   " .. carac.specObj[2] .. " Endurance + 2 => " .. carac.endu
+			obj.text = "- Objet de départ :\n   " .. carac.specObj[2][1] .. " Endurance + 2 => " .. carac.endu
 		elseif rndObj == 2 then
 			carac.meal = 3
 			obj.text = "- Objet de départ :\n   2 repas en plus"
 		elseif rndObj == 3 then
-			table.insert( carac.specObj, "Côte de mailles" )
-			carac.endu = carac.endu + 4
-			obj.text = "- Objet de départ :\n   " .. carac.specObj[2] .. " Endurance + 4 => " .. carac.endu
+			table.insert( carac.specObj, {"Côte de mailles","endu",4} )
+			--carac.endu = carac.endu + 4
+			obj.text = "- Objet de départ :\n   " .. carac.specObj[2][1] .. " Endurance + 4 => " .. carac.endu
 		elseif rndObj == 4 then
 			table.insert( carac.weapon, "Masse d'armes" )
 			obj.text = "- Objet de départ :\n   " .. carac.weapon[2]
