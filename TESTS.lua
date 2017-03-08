@@ -67,35 +67,51 @@ function scene:create( event )
     backToMenu.y = 0
     backToMenu:addEventListener( "tap", gotoMenu )
 
---[[
-    -- TEST : https://coronalabs.com/blog/2013/04/16/lua-string-magic/
-    local function textWrap( str, limit, indent, indent1 )
-       limit = limit or 72
-       indent = indent or ""
-       indent1 = indent1 or indent
-
-       local here = 1 - #indent1
-       return indent1..str:gsub( "(%s+)()(%S+)()",
-          function( sp, st, word, fi )
-             if fi - here > limit then
-                here = st - #indent
-                return "\n"..indent..word
-             end
-          end )
-    end
-
-    local initialText = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
-
-    local wrappedText = textWrap( initialText, 36, nil, "    " )
-
-    print( wrappedText )
-
-    local textBox = display.newRect( 30, 30, 640, 840 )
-    textBox:setFillColor( 200, 80, 50, 50 )
-    textBox.strokeWidth = 4 ; textBox:setStrokeColor( 200, 80, 50, 150 )
-
-    local myParagraph = display.newText( wrappedText, 66, 58, 580, 800, native.systemFont, 28 )
-]]
+-- test pickerwheel
+ 
+-- Set up the picker wheel columns
+local columnData =
+{
+    {
+        align = "left",
+        width = 126,
+        startIndex = 2,
+        labels = { "Hoodie", "Short Sleeve", "Long Sleeve", "Sweatshirt" }
+    },
+    {
+        align = "left",
+        width = 106,
+        labelPadding = 10,
+        startIndex = 1,
+        labels = { "Dark Grey", "White", "Black", "Orange" }
+    },
+    {
+        align = "left",
+        labelPadding = 10,
+        startIndex = 3,
+        labels = { "S", "M", "L", "XL", "XXL" }
+    }
+}
+ 
+-- Create the widget
+pickerWheel = widget.newPickerWheel(
+{
+    x = display.contentCenterX,
+    top = display.contentHeight - 222,
+    fontSize = 18,
+    columns = columnData
+})  
+ 
+-- Get the table of current values for all columns
+-- This can be performed on a button tap, timer execution, or other event
+local values = pickerWheel:getValues()
+ 
+-- Get the value for each column in the wheel, by column index
+local currentStyle = values[1].value
+local currentColor = values[2].value
+local currentSize = values[3].value
+ 
+print( currentStyle, currentColor, currentSize )
 
 end
 
@@ -127,6 +143,7 @@ function scene:hide( event )
 
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
+        pickerWheel:removeSelf()
 
     end
 end

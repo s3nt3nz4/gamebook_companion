@@ -193,7 +193,7 @@ function scene:create( event )
     backpack.anchorX = 0
 
     -- Text field -> add object
-    addObjField = native.newTextField( 130, 80, 180, 20 )
+    addObjField = native.newTextField( 130, 80, 180, 26 )
 	addObjField:addEventListener( "userInput", textListener )
 
     -- Repas

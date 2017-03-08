@@ -36,7 +36,7 @@ local function loadSheet()
 end
 
 -- Déclaration des variables
-local icons, parch_background, backToMenu, title, typedObject, addObjectSpe, objSpe, addSpecObjField
+local icons, parch_background, backToMenu, title, typedObject, addObjectSpe, objSpe
 local deleteSpeObj = {}
 
 -- -----------------------------------------------------------------------------------
@@ -97,7 +97,7 @@ function scene:create( event )
     local function displaySpecObject()
         for i=1, #carac.specObj do
             print (carac.specObj[i][1])
-            objSpe.text = objSpe.text .. "      " .. carac.specObj[i][1] .. " " .. carac.specObj[i][3].." "..carac.specObj[i][2] .. "\n"
+            objSpe.text = objSpe.text .. "      " .. carac.specObj[i][1] .. " | " .. carac.specObj[i][3].." "..carac.specObj[i][2] .. "\n"
             objSpe.anchorY = 0
         end
     end
@@ -161,11 +161,15 @@ function scene:create( event )
     title.x = display.contentCenterX
 
     -- Text field -> add object spec
-    addSpecObjField = native.newTextField( 130, 80, 180, 20 )
+    addSpecObjField = native.newTextField( 130, 80, 180, 26 )
     addSpecObjField:addEventListener( "userInput", textListener )
 
+    -- Effect of the special object (picker wheel)
+ --   effectType = native.newTextField( 130, 110, 180, 30)
+ --   effectType:addEventListener( "userInput", textListener )
+
     -- Alimentation du tableau des objets spéciaux
-    objSpe = display.newText( sceneGroup, "\n", 40, 90, native.systemFont, 18 )
+    objSpe = display.newText( sceneGroup, "\n", 40, 130, native.systemFont, 18 )
     objSpe:setFillColor(0,0,0)
     objSpe.anchorX = 0
     objSpe.anchorY = 0
@@ -179,7 +183,7 @@ function scene:create( event )
 
 
     -- affichage des boutons de suppression des objets spéciaux
-    local y = 111
+    local y = 151
     for i=1, 9 do
         deleteSpeObj[i] = display.newImageRect( sceneGroup, icons, 2, 25, 25 )
         deleteSpeObj[i].anchorX = 0

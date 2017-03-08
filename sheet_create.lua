@@ -27,7 +27,9 @@ end
 
 -- initialisation des variables
 local carac = {
+	habilOrigin = "?",
 	habil = "?",
+	enduOrigin = "?",
 	endu = "?",
 	po = "?",
 	weapon = {"Hache"},
@@ -140,7 +142,9 @@ function scene:create( event )
 		carac.obj = {" "}
 		carac.po = "?"
 		carac.habil = math.random(9)+11
+		carac.habilOrigin = carac.habil
 		carac.endu = math.random(9)+21
+		carac.enduOrigin = carac.endu
 		carac.po = math.random(9)+1
 
 		habil.text = "- Habileté : " .. carac.habil
@@ -160,7 +164,7 @@ function scene:create( event )
 			obj.text = "- Objet de départ :\n   2 repas en plus"
 		elseif rndObj == 3 then
 			table.insert( carac.specObj, {"Côte de mailles","endu",4} )
-			--carac.endu = carac.endu + 4
+			carac.endu = carac.endu + 4
 			obj.text = "- Objet de départ :\n   " .. carac.specObj[2][1] .. " Endurance + 4 => " .. carac.endu
 		elseif rndObj == 4 then
 			table.insert( carac.weapon, "Masse d'armes" )
