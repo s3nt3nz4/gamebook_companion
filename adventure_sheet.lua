@@ -28,8 +28,8 @@ local function gotoSpecialObjects()
 end
 
 local function gotoFight()
-    composer.removeScene( "fight" )
-    composer.gotoScene( "fight" )
+    composer.removeScene( "prepare2fight" )
+    composer.gotoScene( "prepare2fight" )
 end
 
 local json = require("json")
@@ -145,12 +145,12 @@ function scene:create( event )
     title.x = display.contentCenterX
 
     -- Habileté
-    habil = display.newText( sceneGroup, "Habileté : "..carac.habil, 40, 50, native.systemFont, 18 )
+    habil = display.newText( sceneGroup, "Habileté : "..carac.habil, 35, 50, native.systemFont, 18 )
     habil:setFillColor(0,0,0)
     habil.anchorX = 0
 
     -- Endurance
-    endu = display.newText( sceneGroup, "Endurance : "..carac.endu, 160, 50, native.systemFont, 18 )
+    endu = display.newText( sceneGroup, "Endurance : "..carac.endu.."/"..carac.enduOrigin, 150, 50, native.systemFont, 18 )
     endu:setFillColor(0,0,0)
     endu.anchorX = 0
 

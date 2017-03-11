@@ -19,13 +19,15 @@ local function gotoAdventureSheet()
     composer.gotoScene( "adventure_sheet" )
 end
 
+local function gotoCombat()
+    composer.removeScene( "fight" )
+    composer.gotoScene( "fight" )
+end
+
 
 local json = require("json")
 local carac = {}
 local filePath = system.pathForFile( "adventureSheet.json", system.DocumentsDirectory )
-
-
-
 
 -- Charge le fichier adventureSheet.json = fiche perso
 local function loadSheet()
@@ -40,49 +42,8 @@ local function loadSheet()
     end
 end
 
--- Charge la fiche perso
-loadSheet()
-
--- import mob from prepare2fight screen
-local mobName = composer.getVariable("mobName")
-local mobHabil = composer.getVariable("habil")
-local mobEndu = composer.getVariable("endu")
-
 -- Déclaration des variables
-local parch_background, backToMenu, title, combatSeq, caracHero, combatResult, dice
-local round = 1
-local combatRatio = carac.habil - mobHabil + 12
-
-print ("Combat Ratio : "..combatRatio)
-
-
--- Combat result tables
-local CombatResult = 
-{
-    {{0,99},{0,99},{0,8},{0,8},{1,7},{2,6},{3,5},{4,4},{5,3},{6,0}},
-    {{0,99},{0,8},{0,7},{1,7},{2,6},{3,6},{4,5},{5,4},{6,3},{7,0}},
-    {{0,99},{0,8},{0,7},{1,7},{2,6},{3,6},{4,5},{5,4},{6,3},{7,0}},
-    {{0,8},{0,7},{1,6},{2,6},{3,5},{4,5},{5,4},{6,3},{7,2},{8,0}},
-    {{0,8},{0,7},{1,6},{2,6},{3,5},{4,5},{5,4},{6,3},{7,2},{8,0}},
-    {{0,6},{1,6},{2,5},{3,5},{4,4},{5,4},{6,3},{7,2},{8,0},{9,0}},
-    {{0,6},{1,6},{2,5},{3,5},{4,4},{5,4},{6,3},{7,2},{8,0},{9,0}},
-    {{1,6},{2,5},{3,5},{4,4},{5,4},{6,3},{7,2},{8,1},{9,0},{10,0}},
-    {{1,6},{2,5},{3,5},{4,4},{5,4},{6,3},{7,2},{8,1},{9,0},{10,0}},
-    {{2,5},{3,5},{4,4},{5,4},{6,3},{7,2},{8,2},{9,1},{10,0},{11,0}},
-    {{2,5},{3,5},{4,4},{5,4},{6,3},{7,2},{8,2},{9,1},{10,0},{11,0}},
-    {{3,5},{4,4},{5,4},{6,3},{7,2},{8,2},{9,1},{10,0},{11,0},{12,0}},
-    {{4,5},{5,4},{6,3},{7,3},{8,2},{9,2},{10,1},{11,0},{12,0},{14,0}},
-    {{4,5},{5,4},{6,3},{7,3},{8,2},{9,2},{10,1},{11,0},{12,0},{14,0}},
-    {{5,4},{6,3},{7,3},{8,2},{9,2},{10,2},{11,1},{12,0},{14,0},{16,0}},
-    {{5,4},{6,3},{7,3},{8,2},{9,2},{10,2},{11,1},{12,0},{14,0},{16,0}},
-    {{6,4},{7,3},{8,3},{9,2},{10,2},{11,1},{12,0},{14,0},{16,0},{18,0}},
-    {{6,4},{7,3},{8,3},{9,2},{10,2},{11,1},{12,0},{14,0},{16,0},{18,0}},
-    {{7,4},{8,3},{9,2},{10,2},{11,2},{12,1},{14,0},{16,0},{18,0},{99,0}},
-    {{7,4},{8,3},{9,2},{10,2},{11,2},{12,1},{14,0},{16,0},{18,0},{99,0}},
-    {{8,3},{9,3},{10,2},{11,2},{12,2},{14,1},{16,0},{18,0},{99,0},{99,0}},
-    {{8,3},{9,3},{10,2},{11,2},{12,2},{14,1},{16,0},{18,0},{99,0},{99,0}},
-    {{9,3},{10,2},{11,2},{12,2},{14,1},{16,1},{18,0},{99,0},{99,0},{99,0}}
-}
+local parch_background, backToMenu, title, choose, displayMob, startCombat
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -94,6 +55,8 @@ function scene:create( event )
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
 
+    -- Charge la fiche perso
+    loadSheet()
 
     -------------------------------------------------------------------------------------
     -- scene create functions
@@ -112,32 +75,23 @@ function scene:create( event )
       end
     end
 
-    -- function launch dice
-    local function launchDice()
-        local diceResult = math.random(10)
-        print ("résultat du dé : "..diceResult)
-        print ("round "..round.." : ")
-        print ("Mob's loss"..CombatResult[combatRatio][diceResult][1])
-        print ("Hero's loss"..CombatResult[combatRatio][diceResult][2])
-        carac.endu = carac.endu - CombatResult[combatRatio][diceResult][2]
-        mobEndu = mobEndu - CombatResult[combatRatio][diceResult][1]
-        combatSeq.text = combatSeq.text.."Round "..round.." : ".."D="..diceResult.." | "..mobName.."-"..CombatResult[combatRatio][diceResult][1]..
-                         " | Hero-"..CombatResult[combatRatio][diceResult][2].."\n"
-        caracHero.text = "Hero :\nHabileté : "..carac.habil..", Endurance : "..carac.endu
-        displayMob.text = mobName.." :\nHabileté : "..mobHabil..", Endurance : "..mobEndu
+    local function chooseMob()    
+      -- Get the table of current values for all columns
+      -- This can be performed on a button tap, timer execution, or other event
+      local values = pickerWheelFight:getValues()
+       
+      -- Get the value for each column in the wheel, by column index
+      local currentMob = values[1].value
+      local currentHabil = values[2].value
+      local currentEndu = values[3].value
+       
+      print( currentMob, currentHabil, currentEndu )
+      displayMob.text = currentMob.." :\nHabileté : "..currentHabil..", Endurance : "..currentEndu
+      startCombat.text = "Combattre"
 
-        if ( mobEndu <= 0 ) then
-            dice.isVisible = false
-            combatResult.text = "Victoire"
-            combatResult.isVisible = true
-            jsonSave()
-        elseif ( carac.endu <= 0 ) then
-            dice.isVisible = false
-            combatResult.text = "Vous êtes mort"
-            combatResult.isVisible = true
-        end
-
-        round = round + 1
+      composer.setVariable("mobName", currentMob )
+      composer.setVariable("habil", currentHabil )
+      composer.setVariable("endu", currentEndu )
     end
 
     -------------------------------------------------------------------------------------
@@ -160,34 +114,63 @@ function scene:create( event )
     title:setFillColor(0,0,0)
     title.x = display.contentCenterX
 
-    -- Display carac hero
-    caracHero = display.newText( sceneGroup, "Hero :\nHabileté : "..carac.habil..", Endurance : "..carac.endu, 40, 50, native.systemFont, 18 )
-    caracHero:setFillColor(0,0,0)
-    caracHero.anchorX = 0
+    -- Choose
+    choose = display.newText( sceneGroup, "Choisir", 40, 320, native.systemFontBold, 20 )
+    choose:setFillColor(0,0,0)
+    choose.x = display.contentCenterX
 
     -- Display mob
-    displayMob = display.newText( sceneGroup, mobName.." :\nHabileté : "..mobHabil..", Endurance : "..mobEndu, 40, 100, native.systemFont, 18 )
+    displayMob = display.newText( sceneGroup, "", 40, 380, native.systemFont, 18 )
     displayMob:setFillColor(0,0,0)
-    displayMob.anchorX = 0
+    displayMob.x = display.contentCenterX
 
-    -- Display combat sequence
-    combatSeq = display.newText( sceneGroup, "", 40, 250, native.systemFont, 14 )
-    combatSeq:setFillColor(0,0,0)
-    combatSeq.anchorX = 0
-    combatSeq.anchorY = 0
+    -- Start combat
+    startCombat = display.newText( sceneGroup, "", 40, 440, native.systemFontBold, 20 )
+    startCombat:setFillColor(0,0,0)
+    startCombat.x = display.contentCenterX
+    startCombat:addEventListener( "tap", gotoCombat )
 
-    -- Combat result
-    combatResult = display.newText( sceneGroup, "Victoire", 40, 180, native.systemFontBold, 24 )
-    combatResult:setFillColor(0,0,0)
-    combatResult.x = display.contentCenterX
-    combatResult.isVisible = false
 
-    -- Affichage dé
-    dice = display.newImageRect( sceneGroup, "pic/dice.png", 63, 59 )
-    dice.x = display.contentCenterX
-    dice.y = 180
+    -----------------------
+    -- pickerwheelFight
+    -----------------------
 
-    dice:addEventListener( "tap", launchDice )
+    -- Set up the picker wheel columns
+    local columnData =
+    {
+        {
+            align = "left",
+            width = 126,
+            startIndex = 2,
+            labels = { "Kraan", "Vordak", "Black Bear", "Giak" }
+        },
+        {
+            align = "left",
+            labelPadding = 40,
+            startIndex = 2,
+            labels = { 9, 16, 17 }
+        },
+        {
+            align = "left",
+            labelPadding = 10,
+            startIndex = 3,
+            labels = { 9, 10, 24, 25 }
+        }
+    }
+     
+    -- Create the widget
+    pickerWheelFight = widget.newPickerWheel(
+    {
+        x = display.contentCenterX,
+        top = 60,
+        fontSize = 18,
+        columns = columnData
+    })  
+    
+    choose:addEventListener( "tap", chooseMob )
+
+
+    ----------------------------------------------
 
 end
 

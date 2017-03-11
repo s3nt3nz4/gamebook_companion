@@ -67,7 +67,11 @@ function scene:create( event )
     backToMenu.y = 0
     backToMenu:addEventListener( "tap", gotoMenu )
 
+
+-----------------------
 -- test pickerwheel
+-----------------------
+
  
 -- Set up the picker wheel columns
 local columnData =
