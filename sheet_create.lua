@@ -33,6 +33,7 @@ local carac = {
 	endu = "?",
 	po = "?",
 	weapon = {"Hache"},
+	kaiBonusWeapon = " ",
 	meal = 1,
 	specObj = {{"Carte géographique","",""}},
 	obj = {""},
@@ -42,6 +43,16 @@ local carac = {
 local totalkaiRestant = 5
 local filePath = system.pathForFile( "adventureSheet.json", system.DocumentsDirectory )
 --print(filePath)
+
+-- d10 pics
+local diceOptions = {
+    width = 150,
+    height = 150,
+    numFrames = 10,
+    sheetContentWidth = 750,
+    sheetContentHeight = 300
+}
+local d10 = graphics.newImageSheet( "pic/d10.png", diceOptions )
 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -65,6 +76,45 @@ function scene:create( event )
 			io.close( adventureSheet )
 		end
 	end
+
+	-- Dice sequence ---------------------
+    local sequenceDice = {
+        {
+            name = "rollingDice",
+            start = 1,
+            count = 10,
+            time = 1000,
+            loopCount = 0
+        }
+    }
+
+    local function rollingDice( event )
+        --https://docs.coronalabs.com/guide/media/spriteAnimation/index.html
+        local thisDice = event.target
+        thisDice:play()
+    end
+    --------------------------------------
+--[[
+    -- Dice animation functions -----------------
+    local function displayDice( )
+        local side = math.random(10)
+        print( "displayDice called, résultat = "..side)
+        dice = display.newImageRect( sceneGroup, d10, side, 50, 50 )
+        dice.x = 50
+        dice.y = 50
+        return side
+    end
+
+    local function gotoLaunchDice( )
+        timer.performWithDelay( 50, displayDice, 5 )
+        result = displayDice()
+        print ("Résultat final = "..result)
+        dice = display.newImageRect( sceneGroup, d10, result, 50, 50 )
+        dice.x = 50
+        dice.y = 50
+    end
+    --------------------------------------------
+--]]
 
 	-- Images des cases à cocher disciplines kai
 	local options_checkbox = {
@@ -92,10 +142,12 @@ function scene:create( event )
 	title:setFillColor(0,0,0)
 	title.x = display.contentCenterX
 
-	-- Affichage dé
-	local dice = display.newImageRect( sceneGroup, "pic/dice.png", 63, 59 )
-	dice.x = display.contentCenterX
-	dice.y = 70
+    -- display dice
+    local dice = display.newSprite( sceneGroup, d10, sequenceDice )
+    dice:scale(0.35,0.35)
+    dice.x = display.contentCenterX
+    dice.y = 70
+    dice:addEventListener( "tap", rollingDice )
 
 	-- Habileté
 	local habil = display.newText( sceneGroup, "- Habileté : "..carac.habil, 40, 120, native.systemFont, 14 )
@@ -121,6 +173,11 @@ function scene:create( event )
 	local start = display.newText( sceneGroup, "Commencer l'aventure", 75, 470, native.systemFontBold, 18 )
 	start:setFillColor( 0.5, 0.5, 0.5 )
 	start.x = display.contentCenterX
+
+	-- Display kai weapon bonus
+	local kaiWeaponText = display.newText( dkaiGroup, " ", 200, 376, 100, 200, native.systemFont, 10 )
+	kaiWeaponText:setFillColor(0,0,0)
+	kaiWeaponText.anchorX = 0
 
 	-- Fonction affichage start
 	local function displayStart ()
@@ -151,41 +208,59 @@ function scene:create( event )
 		endu.text = "- Endurance : " .. carac.endu
 		po.text = "- Pièces d'or : " .. carac.po
 
-		local rndObj = math.random(9)
-		if rndObj == 0 then
+		local rndObj = math.random(10)
+		if rndObj == 1 then
 			table.insert( carac.weapon, "Epée" )
 			obj.text = "- Objet de départ :\n   " .. carac.weapon[2]
-		elseif rndObj == 1 then
+		elseif rndObj == 2 then
 			table.insert( carac.specObj, {"Casque","endu",2} )
 			carac.endu = carac.endu + 2
 			obj.text = "- Objet de départ :\n   " .. carac.specObj[2][1] .. " Endurance + 2 => " .. carac.endu
-		elseif rndObj == 2 then
+		elseif rndObj == 3 then
 			carac.meal = 3
 			obj.text = "- Objet de départ :\n   2 repas en plus"
-		elseif rndObj == 3 then
+		elseif rndObj == 4 then
 			table.insert( carac.specObj, {"Côte de mailles","endu",4} )
 			carac.endu = carac.endu + 4
 			obj.text = "- Objet de départ :\n   " .. carac.specObj[2][1] .. " Endurance + 4 => " .. carac.endu
-		elseif rndObj == 4 then
+		elseif rndObj == 5 then
 			table.insert( carac.weapon, "Masse d'armes" )
 			obj.text = "- Objet de départ :\n   " .. carac.weapon[2]
-		elseif rndObj == 5 then
+		elseif rndObj == 6 then
 			carac.obj[1] = "Potion de guérison"
 			obj.text = "- Objet de départ :\n   " .. carac.obj[1] .. " (1 dose)"
-		elseif rndObj == 6 then
+		elseif rndObj == 7 then
 			table.insert( carac.weapon, "Bâton" )
 			obj.text = "- Objet de départ :\n   " .. carac.weapon[2]
-		elseif rndObj == 7 then
+		elseif rndObj == 8 then
 			table.insert( carac.weapon, "Lance" )
 			obj.text = "- Objet de départ :\n   " .. carac.weapon[2]
-		elseif rndObj == 8 then
+		elseif rndObj == 9 then
 			carac.po = carac.po + 12
 			obj.text = "- Objet de départ :\n   +12 couronnes => " .. carac.po
-		elseif rndObj == 9 then
+		elseif rndObj == 10 then
 			table.insert( carac.weapon, "Glaive" )
 			obj.text = "- Objet de départ :\n   " .. carac.weapon[2]
 		--else print("Erreur dans le choix de l'objet de départ !")
 		end
+
+		-- Kai bonus weapon
+		local rndKaiWeapon = math.random(10)
+		if rndKaiWeapon == 1 then carac.kaiBonusWeapon = "Poignard"
+		elseif rndKaiWeapon == 2 then carac.kaiBonusWeapon = "Lance"
+		elseif rndKaiWeapon == 3 then carac.kaiBonusWeapon = "Masse d'arme"
+		elseif rndKaiWeapon == 4 then carac.kaiBonusWeapon = "Sabre"
+		elseif rndKaiWeapon == 5 then carac.kaiBonusWeapon = "Marteau"
+		elseif rndKaiWeapon == 6 then carac.kaiBonusWeapon = "Epée"
+		elseif rndKaiWeapon == 7 then carac.kaiBonusWeapon = "Hache"
+		elseif rndKaiWeapon == 8 then carac.kaiBonusWeapon = "Epée"
+		elseif rndKaiWeapon == 9 then carac.kaiBonusWeapon = "Bâton"
+		elseif rndKaiWeapon == 10 then carac.kaiBonusWeapon = "Glaive"
+		end
+
+		-- Display kai weapon bonus
+		kaiWeaponText.text = "-> "..carac.kaiBonusWeapon
+
 		displayStart()
 	--	jsonSave()
   end
@@ -211,9 +286,12 @@ function scene:create( event )
 		end
 	end
 
+
+
 	-- Listener disciplines Kai
 	local function dkaiListener( event )
-	local Dkaicheckbox = event.target
+		local Dkaicheckbox = event.target
+	
 	-- tests checkboxes
 		if Dkaicheckbox.isOn == true and Dkaicheckbox.id == "dkaihide" then	addKai(Dkaicheckbox.id)
 		elseif Dkaicheckbox.isOn == false and Dkaicheckbox.id == "dkaihide"	then removeKai(Dkaicheckbox.id)
@@ -276,7 +354,7 @@ function scene:create( event )
 	}
 	dkaiGroup:insert( dkaiHunt )
 
-	local dkaihuntText = display.newText( dkaiGroup, "Chasse", 75, 200, native.systemFont, 14 )
+	local dkaihuntText = display.newText( dkaiGroup, "Chasse (dispense des repas)", 75, 200, native.systemFont, 14 )
 	dkaihuntText:setFillColor(0,0,0)
 	dkaihuntText.anchorX = 0
 
@@ -295,9 +373,9 @@ function scene:create( event )
 	}
 	dkaiGroup:insert( dkai6 )
 
-	local dkaihuntText = display.newText( dkaiGroup, "6ème sens", 75, 220, native.systemFont, 14 )
-	dkaihuntText:setFillColor(0,0,0)
-	dkaihuntText.anchorX = 0
+	local dkai6Text = display.newText( dkaiGroup, "6ème sens", 75, 220, native.systemFont, 14 )
+	dkai6Text:setFillColor(0,0,0)
+	dkai6Text.anchorX = 0
 
 	-- Orientation --------------------------------------------------
 	local dkaiorient = widget.newSwitch {
@@ -314,9 +392,9 @@ function scene:create( event )
 	}
 	dkaiGroup:insert( dkaiorient )
 
-	local dkaihuntText = display.newText( dkaiGroup, "Orientation", 75, 240, native.systemFont, 14 )
-	dkaihuntText:setFillColor(0,0,0)
-	dkaihuntText.anchorX = 0
+	local dkaiorientText = display.newText( dkaiGroup, "Orientation", 75, 240, native.systemFont, 14 )
+	dkaiorientText:setFillColor(0,0,0)
+	dkaiorientText.anchorX = 0
 
 	-- Guérison --------------------------------------------------
 	local dkaiheal = widget.newSwitch {
@@ -333,9 +411,9 @@ function scene:create( event )
 	}
 	dkaiGroup:insert( dkaiheal )
 
-	local dkaihuntText = display.newText( dkaiGroup, "Guérison", 75, 260, native.systemFont, 14 )
-	dkaihuntText:setFillColor(0,0,0)
-	dkaihuntText.anchorX = 0
+	local dkaihealText = display.newText( dkaiGroup, "Guérison (+1END / § sans combat)", 75, 260, native.systemFont, 14 )
+	dkaihealText:setFillColor(0,0,0)
+	dkaihealText.anchorX = 0
 
 	-- Maîtrise des armes --------------------------------------------------
 	local dkaiweapon = widget.newSwitch {
@@ -352,9 +430,9 @@ function scene:create( event )
 	}
 	dkaiGroup:insert( dkaiweapon )
 
-	local dkaihuntText = display.newText( dkaiGroup, "Maîtrise des armes", 75, 280, native.systemFont, 14 )
-	dkaihuntText:setFillColor(0,0,0)
-	dkaihuntText.anchorX = 0
+	local dkaiweaponText = display.newText( dkaiGroup, "Maîtrise des armes", 75, 280, native.systemFont, 14 )
+	dkaiweaponText:setFillColor(0,0,0)
+	dkaiweaponText.anchorX = 0
 
 	-- Bouclier psychique --------------------------------------------------
 	local dkaishield = widget.newSwitch {
@@ -371,9 +449,9 @@ function scene:create( event )
 	}
 	dkaiGroup:insert( dkaishield )
 
-	local dkaihuntText = display.newText( dkaiGroup, "Bouclier psychique", 75, 300, native.systemFont, 14 )
-	dkaihuntText:setFillColor(0,0,0)
-	dkaihuntText.anchorX = 0
+	local dkaishieldText = display.newText( dkaiGroup, "Bouclier psychique", 75, 300, native.systemFont, 14 )
+	dkaishieldText:setFillColor(0,0,0)
+	dkaishieldText.anchorX = 0
 
 	-- Puissance psychique --------------------------------------------------
 	local dkaipsy = widget.newSwitch {
@@ -390,9 +468,9 @@ function scene:create( event )
 	}
 	dkaiGroup:insert( dkaipsy )
 
-	local dkaihuntText = display.newText( dkaiGroup, "Puissance psychique", 75, 320, native.systemFont, 14 )
-	dkaihuntText:setFillColor(0,0,0)
-	dkaihuntText.anchorX = 0
+	local dkaipsyText = display.newText( dkaiGroup, "Puissance psychique", 75, 320, native.systemFont, 14 )
+	dkaipsyText:setFillColor(0,0,0)
+	dkaipsyText.anchorX = 0
 
 	-- Communication animale --------------------------------------------------
 	local dkaianima = widget.newSwitch {
@@ -409,9 +487,9 @@ function scene:create( event )
 	}
 	dkaiGroup:insert( dkaianima )
 
-	local dkaihuntText = display.newText( dkaiGroup, "Communication animale", 75, 340, native.systemFont, 14 )
-	dkaihuntText:setFillColor(0,0,0)
-	dkaihuntText.anchorX = 0
+	local dkaianimaText = display.newText( dkaiGroup, "Communication animale", 75, 340, native.systemFont, 14 )
+	dkaianimaText:setFillColor(0,0,0)
+	dkaianimaText.anchorX = 0
 
 	-- Maîtrise psychique de la matière --------------------------------------------------
 	local dkaitelek = widget.newSwitch {
@@ -428,13 +506,13 @@ function scene:create( event )
 	}
 	dkaiGroup:insert( dkaitelek )
 
+	local dkaitelekText = display.newText( dkaiGroup, "Maîtrise psychique de la matière", 75, 360, native.systemFont, 14 )
+	dkaitelekText:setFillColor(0,0,0)
+	dkaitelekText.anchorX = 0
+
 	-- Déplace le groupe dkaiGroup
 	dkaiGroup.x = 10
 	dkaiGroup.y = 10
-
-	local dkaihuntText = display.newText( dkaiGroup, "Maîtrise psychique de la matière", 75, 360, native.systemFont, 14 )
-	dkaihuntText:setFillColor(0,0,0)
-	dkaihuntText.anchorX = 0
 
 	-- insert groupe kai dans sceneGroup -------------------------
 	sceneGroup:insert( dkaiGroup )

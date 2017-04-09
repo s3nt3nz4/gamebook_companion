@@ -100,11 +100,11 @@ function scene:create( event )
     local function kaiDecode(kai)
         local libKai = ""
         if kai == "dkaihide" then libKai = "Camouflage"
-        elseif kai == "dkaihunt" then libKai = "Chasse"
+        elseif kai == "dkaihunt" then libKai = "Chasse (dispense des repas)"
         elseif kai == "dkai6" then libKai = "6ème sens"
         elseif kai == "dkaiorient" then libKai = "Orientation"
-        elseif kai == "dkaiheal" then libKai = "Guérison"
-        elseif kai == "dkaiweapon" then libKai = "Maîtrise des armes"
+        elseif kai == "dkaiheal" then libKai = "Guérison (+1END / § sans combat)"
+        elseif kai == "dkaiweapon" then libKai = "Maîtrise des armes ("..carac.kaiBonusWeapon..")"
         elseif kai == "dkaishield" then libKai = "Bouclier psychique"
         elseif kai == "dkaipsy" then libKai = "Puissance psychique"
         elseif kai == "dkaianima" then libKai = "Communication animale"
@@ -155,7 +155,7 @@ function scene:create( event )
     endu.anchorX = 0
 
     -- Disciplines kai
-    kai = display.newText( sceneGroup, "Disciplines kai :\n", 40, 80, native.systemFont, 16 )
+    kai = display.newText( sceneGroup, "Disciplines kai :\n", 30, 80, native.systemFont, 16 )
     kai:setFillColor(0,0,0)
     kai.anchorX = 0
     

@@ -67,55 +67,41 @@ function scene:create( event )
     backToMenu.y = 0
     backToMenu:addEventListener( "tap", gotoMenu )
 
-
------------------------
--- test pickerwheel
------------------------
-
- 
--- Set up the picker wheel columns
-local columnData =
-{
-    {
-        align = "left",
-        width = 126,
-        startIndex = 2,
-        labels = { "Hoodie", "Short Sleeve", "Long Sleeve", "Sweatshirt" }
-    },
-    {
-        align = "left",
-        width = 106,
-        labelPadding = 10,
-        startIndex = 1,
-        labels = { "Dark Grey", "White", "Black", "Orange" }
-    },
-    {
-        align = "left",
-        labelPadding = 10,
-        startIndex = 3,
-        labels = { "S", "M", "L", "XL", "XXL" }
+    -- d10 pics
+    local diceOptions = {
+        width = 150,
+        height = 150,
+        numFrames = 10,
+        sheetContentWidth = 750,
+        sheetContentHeight = 300
     }
-}
- 
--- Create the widget
-pickerWheel = widget.newPickerWheel(
-{
-    x = display.contentCenterX,
-    top = display.contentHeight - 222,
-    fontSize = 18,
-    columns = columnData
-})  
- 
--- Get the table of current values for all columns
--- This can be performed on a button tap, timer execution, or other event
-local values = pickerWheel:getValues()
- 
--- Get the value for each column in the wheel, by column index
-local currentStyle = values[1].value
-local currentColor = values[2].value
-local currentSize = values[3].value
- 
-print( currentStyle, currentColor, currentSize )
+    local d10 = graphics.newImageSheet( "pic/d10.png", diceOptions )
+
+
+    local sequenceDice = {
+        {
+            name = "rollingDice",
+            start = 1,
+            count = 10,
+            time = 1000,
+            loopCount = 1
+        }
+    }
+
+    local function rollingDice( event )
+        --https://docs.coronalabs.com/guide/media/spriteAnimation/index.html
+        local thisDice = event.target
+        thisDice:play()
+    end
+
+    -- display dice
+    local startSide = math.random(10)
+    local dice = display.newSprite( sceneGroup, d10, sequenceDice )
+    dice:scale(0.35,0.35)
+    dice.x = 50
+    dice.y = 50
+    dice:addEventListener( "tap", rollingDice )
+
 
 end
 
@@ -147,7 +133,6 @@ function scene:hide( event )
 
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen
-        pickerWheel:removeSelf()
 
     end
 end

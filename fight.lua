@@ -84,6 +84,28 @@ local CombatResult =
     {{9,3},{10,2},{11,2},{12,2},{14,1},{16,1},{18,0},{99,0},{99,0},{99,0}}
 }
 
+-- d10 pics
+local diceOptions = {
+    width = 150,
+    height = 150,
+    numFrames = 10,
+    sheetContentWidth = 750,
+    sheetContentHeight = 300
+}
+local d10 = graphics.newImageSheet( "pic/d10.png", diceOptions )
+
+-- dice sequence
+local sequenceDice = {
+    {
+        name = "rollingDice",
+        start = 1,
+        count = 10,
+        time = 1000,
+        loopCount = 1
+    }
+}
+
+
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -112,33 +134,49 @@ function scene:create( event )
       end
     end
 
-    -- function launch dice
-    local function launchDice()
+
+    -- Dice animation functions -----------------
+
+    local function checkDiceRoll( event )
+        local rollingDice = event.target
         local diceResult = math.random(10)
-        print ("résultat du dé : "..diceResult)
-        print ("round "..round.." : ")
-        print ("Mob's loss"..CombatResult[combatRatio][diceResult][1])
-        print ("Hero's loss"..CombatResult[combatRatio][diceResult][2])
-        carac.endu = carac.endu - CombatResult[combatRatio][diceResult][2]
-        mobEndu = mobEndu - CombatResult[combatRatio][diceResult][1]
-        combatSeq.text = combatSeq.text.."Round "..round.." : ".."D="..diceResult.." | "..mobName.."-"..CombatResult[combatRatio][diceResult][1]..
-                         " | Hero-"..CombatResult[combatRatio][diceResult][2].."\n"
-        caracHero.text = "Hero :\nHabileté : "..carac.habil..", Endurance : "..carac.endu
-        displayMob.text = mobName.." :\nHabileté : "..mobHabil..", Endurance : "..mobEndu
+        if (event.phase == "ended" ) then
+            rollingDice:setFrame( diceResult )
 
-        if ( mobEndu <= 0 ) then
-            dice.isVisible = false
-            combatResult.text = "Victoire"
-            combatResult.isVisible = true
-            jsonSave()
-        elseif ( carac.endu <= 0 ) then
-            dice.isVisible = false
-            combatResult.text = "Vous êtes mort"
-            combatResult.isVisible = true
+            -- affichages console
+            print ("résultat du dé : "..diceResult)
+            print ("round "..round.." : ")
+            print ("Mob's loss"..CombatResult[combatRatio][diceResult][1])
+            print ("Hero's loss"..CombatResult[combatRatio][diceResult][2])
+
+            carac.endu = carac.endu - CombatResult[combatRatio][diceResult][2]
+            mobEndu = mobEndu - CombatResult[combatRatio][diceResult][1]
+            combatSeq.text = combatSeq.text.."Round "..round.." : ".."D="..diceResult.." | "..mobName.."-"..CombatResult[combatRatio][diceResult][1]..
+                             " | Hero-"..CombatResult[combatRatio][diceResult][2].."\n"
+            caracHero.text = "Hero :\nHabileté : "..carac.habil..", Endurance : "..carac.endu
+            displayMob.text = mobName.." :\nHabileté : "..mobHabil..", Endurance : "..mobEndu
+
+            if ( mobEndu <= 0 ) then
+                event.target.isVisible = false
+                combatResult.text = "Victoire"
+                combatResult.isVisible = true
+                jsonSave()
+            elseif ( carac.endu <= 0 ) then
+                event.target.isVisible = false
+                combatResult.text = "Vous êtes mort"
+                combatResult.isVisible = true
+            end
+
+            round = round + 1
         end
-
-        round = round + 1
     end
+
+    local function rollingDice( event )
+        --https://docs.coronalabs.com/guide/media/spriteAnimation/index.html
+        local launchDice = event.target
+        launchDice:play()
+    end
+
 
     -------------------------------------------------------------------------------------
     -- scene create display and listeners
@@ -182,12 +220,14 @@ function scene:create( event )
     combatResult.x = display.contentCenterX
     combatResult.isVisible = false
 
-    -- Affichage dé
-    dice = display.newImageRect( sceneGroup, "pic/dice.png", 63, 59 )
+    -- display dice
+    local startSide = math.random(10)
+    local dice = display.newSprite( sceneGroup, d10, sequenceDice )
+    dice:scale(0.35,0.35)
     dice.x = display.contentCenterX
     dice.y = 180
-
-    dice:addEventListener( "tap", launchDice )
+    dice:addEventListener( "tap", rollingDice )
+    dice:addEventListener( "sprite", checkDiceRoll )
 
 end
 
