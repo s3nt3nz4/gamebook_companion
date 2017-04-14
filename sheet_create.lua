@@ -94,27 +94,6 @@ function scene:create( event )
         thisDice:play()
     end
     --------------------------------------
---[[
-    -- Dice animation functions -----------------
-    local function displayDice( )
-        local side = math.random(10)
-        print( "displayDice called, résultat = "..side)
-        dice = display.newImageRect( sceneGroup, d10, side, 50, 50 )
-        dice.x = 50
-        dice.y = 50
-        return side
-    end
-
-    local function gotoLaunchDice( )
-        timer.performWithDelay( 50, displayDice, 5 )
-        result = displayDice()
-        print ("Résultat final = "..result)
-        dice = display.newImageRect( sceneGroup, d10, result, 50, 50 )
-        dice.x = 50
-        dice.y = 50
-    end
-    --------------------------------------------
---]]
 
 	-- Images des cases à cocher disciplines kai
 	local options_checkbox = {

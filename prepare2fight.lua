@@ -42,6 +42,21 @@ local function loadSheet()
     end
 end
 
+
+-- Image sheet options and declaration
+local options = {
+    frames = 
+    {
+        { x=0, y=0, width=320, height=222 },
+        { x=328, y=0, width=320, height=222 },
+        { x=656, y=0, width=12, height=222 }
+    },
+    sheetContentWidth = 668,
+    sheetContentHeight = 222
+}
+local pickerWheel = graphics.newImageSheet( "pic/widget-pickerwheel-standard.png", options )
+
+
 -- Déclaration des variables
 local parch_background, backToMenu, title, choose, displayMob, startCombat
 
@@ -75,7 +90,7 @@ function scene:create( event )
       end
     end
 
-    local function chooseMob()    
+    local function chooseMob( event )    
       -- Get the table of current values for all columns
       -- This can be performed on a button tap, timer execution, or other event
       local values = pickerWheelFight:getValues()
@@ -164,7 +179,11 @@ function scene:create( event )
         x = display.contentCenterX,
         top = 60,
         fontSize = 18,
-        columns = columnData
+        sheet = pickerWheel,
+        columns = columnData,
+        overlayFrame = 1,
+        backgroundFrame = 2,
+        separatorFrame = 3
     })  
     
     choose:addEventListener( "tap", chooseMob )
